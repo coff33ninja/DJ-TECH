@@ -67,7 +67,10 @@ if [[ "$RECUT" == "0" ]]; then
   ' CHANGELOG.md > "$TMP"
   # Add the version link reference (newest first) before the first existing link.
   if grep -qE '^\[[0-9]+\.[0-9]+\.[0-9]+\]: https://github.com/' "$TMP"; then
-    sed -i "0,/^\[[0-9]+\.[0-9]+\.[0-9]+\]: https:\/\/github.com\//i\\[$NEW_VERSION]: https://github.com/$REPO/releases/tag/$TAG" "$TMP"
+    awk -v nl="[$NEW_VERSION]: https://github.com/$REPO/releases/tag/$TAG" '
+      /^\[[0-9]+\.[0-9]+\.[0-9]+\]: https:\/\/github.com\// && !done { print nl; done=1 }
+      { print }
+    ' "$TMP" > "$TMP.new" && mv "$TMP.new" "$TMP"
   else
     printf '\n[%s]: https://github.com/%s/releases/tag/%s\n' "$NEW_VERSION" "$REPO" "$TAG" >> "$TMP"
   fi

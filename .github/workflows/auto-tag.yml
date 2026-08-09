@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths: [package.json, bun.lock]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,9 +13,22 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2
+          persist-credentials: false
+
+      - name: Configure git with push token
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          if [ -z "$PUSH_TOKEN" ]; then
+            echo "::error::Secret PUSH_TOKEN is not configured. Add a fine-grained PAT (Contents: read+write) to enable the release cascade."
+            exit 1
+          fi
+          git remote set-url origin "https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Read version
         id: version
@@ -56,13 +70,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
           # Only add the entry when [Unreleased] has no bullets yet (empty after a release).
-          bullets="$(awk '/^## \[Unreleased\]/{f=1;next} f&&/^## \[/{exit} f{print}' CHANGELOG.md | grep -vE '^[[:space:]]*$' | grep -cE '^[-*]' || true)"
+          unrel="$(awk '/^## \[Unreleased\]/{f=1;next} f&&/^## \[/{exit} f{print}' CHANGELOG.md)"
+          bullets="$(printf '%s' "$unrel" | grep -vE '^[[:space:]]*$' | grep -cE '^[-*]' || true)"
           echo "[Unreleased] bullet count: ${bullets:-0}"
-          if [ "${bullets:-0}" -eq 0 ] && ! grep -qF "**Dependency updates**" CHANGELOG.md; then
+          if [ "${bullets:-0}" -eq 0 ] && ! printf '%s' "$unrel" | grep -qF "**Dependency updates**"; then
             awk '
               /^## \[Unreleased\]$/ {
                 print "## [Unreleased]"
