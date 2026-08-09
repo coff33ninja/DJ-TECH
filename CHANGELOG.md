@@ -4,6 +4,22 @@ All notable changes to DJ Tech are documented here. Format follows [Keep a Chang
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-09
+
+
+### Changed
+
+- **Dependency updates** - applied latest dependency versions via weekly `bun update` / Dependabot.
+
+
+## [1.0.1] - 2026-08-09
+
+
+### Changed
+
+- **Dependency updates** - applied latest dependency versions via weekly `bun update` / Dependabot.
+
+
 ## [1.0.0] - 2026-08-09
 
 Fresh start with a clean git history. Initial release of the complete repair-shop management system.
@@ -51,4 +67,6 @@ Fresh start with a clean git history. Initial release of the complete repair-sho
 - Backup validation (`validateBackup`) runs before any restore; malformed or oversized uploads are rejected with JSON errors.
 - Firebase web app config no longer committed to git — supplied via `VITE_FIREBASE_*` environment variables / CI secrets.
 
+[1.0.2]: https://github.com/coff33ninja/DJ-TECH/releases/tag/v1.0.2
+[1.0.1]: https://github.com/coff33ninja/DJ-TECH/releases/tag/v1.0.1
 [1.0.0]: https://github.com/coff33ninja/DJ-TECH/releases/tag/v1.0.0
