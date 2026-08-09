@@ -1,0 +1,19 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+wa_session/
+firebase-applet-config.json
+
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md
+sqlite.db
+/data
+
+*.db
+*.bak

@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Read version
+        id: version
+        run: |
+          ver=$(node -p "require('./package.json').version")
+          tag="${{ github.ref_name }}"
+          if [ "v$ver" != "$tag" ]; then
+            echo "ERROR: package.json version ($ver) does not match tag ($tag)"
+            exit 1
+          fi
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+
+      - name: Lint
+        run: bun install --frozen-lockfile && bun run lint
+
+      - name: Build
+        run: bun run build
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          ver="${{ steps.version.outputs.version }}"
+          content=$(cat CHANGELOG.md)
+          body=$(printf '%s' "$content" | awk -v v="## [$ver]" 'BEGIN{found=0} index($0,v)==1{found=1; next} found && /^## \[/{exit} found{print}')
+          if [ -n "$body" ]; then
+            printf '%s' "$body" > changelog-release.md
+            echo "Changelog extracted for v$ver"
+          else
+            echo "No changelog entry found for v$ver"
+            echo "See CHANGELOG.md for details." > changelog-release.md
+          fi
+
+      - name: Create source archive
+        run: |
+          ver="${{ steps.version.outputs.version }}"
+          git archive --format=zip --prefix=dj-tech-v$ver/ -o dj-tech-source.zip HEAD
+          echo "archive=dj-tech-source.zip" >> "$GITHUB_ENV"
+          echo "archive_name=dj-tech-source-v$ver.zip" >> "$GITHUB_ENV"
+
+      - name: Checksum
+        run: |
+          mv "${{ env.archive }}" "${{ env.archive_name }}"
+          sha256sum "${{ env.archive_name }}" > "${{ env.archive_name }}.sha256"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.version.outputs.version }}
+          body_path: changelog-release.md
+          files: |
+            ${{ env.archive_name }}
+            ${{ env.archive_name }}.sha256
+          fail_on_unmatched_files: false
+          generate_release_notes: false

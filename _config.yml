@@ -1,0 +1,42 @@
+title: DJ TECH
+description: Repair shop management system — job cards, inventory, invoicing, WhatsApp and email
+remote_theme: pages-themes/hacker@v0.2.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-readme-index
+show_downloads: true
+
+# The repo root is a Vite app (index.html, src/, public/). The Pages site is
+# the README documentation, so exclude everything app-related from the build.
+exclude:
+  - index.html
+  - src
+  - public
+  - node_modules
+  - dist
+  - build
+  - coverage
+  - scripts
+  - seed.ts
+  - server.ts
+  - vite.config.ts
+  - tsconfig.json
+  - package.json
+  - bun.lock
+  - package-lock.json
+  - Dockerfile
+  - Jenkinsfile
+  - .github
+  - .git
+  - .gitignore
+  - .dockerignore
+  - .env
+  - .env.example
+  - data
+  - wa_session
+  - sqlite.db
+  - "*.db"
+  - "*.bak"
+  - "*.log"
+  - docs/Information.md
+  - docs/slices.md
