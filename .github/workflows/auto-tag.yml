@@ -71,9 +71,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Only add the entry when [Unreleased] has no bullets yet (empty after a release).
-          bullets="$(awk '/^## \[Unreleased\]/{f=1;next} f&&/^## \[/{exit} f{print}' CHANGELOG.md | grep -vE '^[[:space:]]*$' | grep -cE '^[-*]' || true)"
+          unrel="$(awk '/^## \[Unreleased\]/{f=1;next} f&&/^## \[/{exit} f{print}' CHANGELOG.md)"
+          bullets="$(printf '%s' "$unrel" | grep -vE '^[[:space:]]*$' | grep -cE '^[-*]' || true)"
           echo "[Unreleased] bullet count: ${bullets:-0}"
-          if [ "${bullets:-0}" -eq 0 ] && ! grep -qF "**Dependency updates**" CHANGELOG.md; then
+          if [ "${bullets:-0}" -eq 0 ] && ! printf '%s' "$unrel" | grep -qF "**Dependency updates**"; then
             awk '
               /^## \[Unreleased\]$/ {
                 print "## [Unreleased]"
