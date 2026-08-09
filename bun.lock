@@ -31,7 +31,6 @@
         "react-router-dom": "^7.18.2",
         "tailwind-merge": "^3.6.0",
         "ulid": "^3.0.2",
-        "vite": "^6.2.3",
       },
       "devDependencies": {
         "@types/cors": "^2.8.19",
