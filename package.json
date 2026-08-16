@@ -18,7 +18,7 @@
     "@google/genai": "^2.4.0",
     "@libsql/client": "^0.17.4",
     "@tailwindcss/vite": "^4.1.14",
-    "@vitejs/plugin-react": "^5.0.4",
+    "@vitejs/plugin-react": "^6.0.5",
     "@whiskeysockets/baileys": "6.7.22",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
